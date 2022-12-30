@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\kingon;
+use App\Http\Controllers\KingOnAPI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,5 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/devices', [kingon::class, 'store']);
-Route::get('/devices', [kingon::class, 'index']);
+Route::post('/devices', [KingOnAPI::class, 'store']);
+Route::put('/devices/{id}/port', [KingOnAPI::class, 'update']);
