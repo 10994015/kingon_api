@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChargerDetail;
+use App\Models\RecordChargerDetail;
+use App\Models\StorageChargerDetail;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 class KingOnAPI extends Controller
 {
@@ -32,11 +35,71 @@ class KingOnAPI extends Controller
         }
     }
     public function update(Request $req, $id){
-        log::info($id);
-        $charger_num = ChargerDetail::where([['charger_car_id', $id], ['school_date', date("Y-m-d")], ['time_seq', date('H')]])->count();
-        log::info($charger_num);
-        if($charger_num > 0){
-            
+        try{
+            $i = 0;
+            while(true){
+                if(is_array($req[$i])){
+                    if(count($req[$i]) > 0 ){
+                        $record = new RecordChargerDetail();
+                        $record->charger_car_id = $id;
+                        $record->school_date = date("Y-m-d");
+                        $record->time_seq = date('H');
+                        $record->port_no  = $req[$i]['No'];
+                        $record->capacity  = $req[$i]['Capacity'];
+                        $record->statu  = $req[$i]['State'];
+                        $record->save();
+    
+                        $storage = new StorageChargerDetail();
+                        $storage->charger_car_id = $id;
+                        $storage->school_date = date("Y-m-d");
+                        $storage->time_seq = date('H');
+                        $storage->port_no  = $req[$i]['No'];
+                        $storage->capacity  = $req[$i]['Capacity'];
+                        $storage->statu  = $req[$i]['State'];
+                        $storage->save();
+                        
+                        $i++;
+                    }else{
+                        break;
+                    }
+                }else{
+                    break;
+                }
+                
+            }
+            $i = 0;
+            $charger_num = ChargerDetail::where([['charger_car_id', $id], ['school_date', date("Y-m-d")], ['time_seq', date('H')]])->count();
+            if($charger_num == 0){
+                $charger_deposit_device = ChargerDetail::where('charger_car_id', $id)->orderBy('created_at', 'DESC')->first()->deposit_device;
+    
+                $charge_amount = 0;
+                $statu = "";
+    
+                $storages = StorageChargerDetail::where('charger_car_id', $id)->get();
+                foreach($storages as $storage){
+                    $charge_amount = $charge_amount + $storage->capacity;
+                    $statu = $statu . $storage->statu . "\n";
+                }
+    
+    
+                $charger = new ChargerDetail();
+                $charger->charger_car_id = $id;
+                $charger->school_date = date("Y-m-d");
+                $charger->time_seq = date("H");
+                $charger->charge_amount = $charge_amount;
+                $charger->statu = $statu;
+                $charger->deposit_device = $charger_deposit_device;
+                $charger->save();
+                // StorageChargerDetail::where('id', '>', '0')->get()->delete();
+                DB::table('storage_charger_datail')->truncate();
+
+            }
+    
+            return ['message' => '傳送成功！'];
+        }catch (Exception $e){
+            return ['message' => '傳送失敗！', 'error'=> $e];
         }
+        
     }
+    
 }
