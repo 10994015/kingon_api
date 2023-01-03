@@ -3,6 +3,7 @@
 use App\Http\Controllers\kingon;
 use App\Http\Controllers\KingOnAPI;
 use App\Http\Controllers\Upload;
+use App\Http\Controllers\UploadAPI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/devices', [KingOnAPI::class, 'store']);
 Route::put('/devices/{id}/ports', [KingOnAPI::class, 'update']);
-Route::post('/upload_img', [Upload::class, 'store']);
