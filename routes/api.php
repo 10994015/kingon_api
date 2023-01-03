@@ -22,5 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/devices', [KingOnAPI::class, 'store']);
-Route::put('/devices/{id}/port', [KingOnAPI::class, 'update']);
+Route::put('/devices/{id}/ports', [KingOnAPI::class, 'update']);
 Route::post('/upload_img', [Upload::class, 'store']);

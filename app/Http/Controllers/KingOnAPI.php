@@ -29,9 +29,9 @@ class KingOnAPI extends Controller
             $charger->deposit_device = $req->TabletNumber;
             $charger->statu = "0";
             $result = $charger->save();
-            return ['message' => '成功!'];
+            return ['message' => 'Data sent successfully!'];
         }catch (Exception $e){
-            return ['message' => '傳送失敗！', 'error'=>$e];
+            return ['message' => 'Data transfer failed!', 'error'=>$e];
         }
     }
     public function update(Request $req, $id){
@@ -95,9 +95,9 @@ class KingOnAPI extends Controller
 
             }
     
-            return ['message' => '傳送成功！'];
+            return ['message' => 'Data sent successfully!'];
         }catch (Exception $e){
-            return ['message' => '傳送失敗！', 'error'=> $e];
+            return ['message' => 'Data transfer failed!', 'error'=> $e];
         }
         
     }
