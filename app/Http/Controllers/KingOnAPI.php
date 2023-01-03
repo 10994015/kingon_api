@@ -31,7 +31,7 @@ class KingOnAPI extends Controller
             $result = $charger->save();
             return ['message' => '成功!'];
         }catch (Exception $e){
-            return ['message' => $e];
+            return ['message' => '傳送失敗！', 'error'=>$e];
         }
     }
     public function update(Request $req, $id){
