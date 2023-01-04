@@ -9,4 +9,5 @@ class ChargerDetail extends Model
 {
     use HasFactory;
     protected $table = "charger_detail";
+    protected $primaryKey = 'charger_car_id';
 }

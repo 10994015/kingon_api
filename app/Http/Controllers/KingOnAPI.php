@@ -16,19 +16,27 @@ class KingOnAPI extends Controller
         //如果是一個平板，我們一次新增就是新增他所有平版的資料嗎?
         //如果是每台車，那statu上游是傳送每個平版的status, 那每個row的status要寫哪一台的?
         try{
+            $charger_detail_total = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->count();
             $charge_amount = 0;
             foreach($req['Trolley']['Ports'] as $post){
                 $charge_amount = $charge_amount + $post['Capacity'];
             }
-            log::info($charge_amount);
-            $charger = new ChargerDetail();
-            $charger->charger_car_id = $req->ID;
-            $charger->school_date = date("Y-m-d");
-            $charger->time_seq = date("H");
-            $charger->charge_amount = $charge_amount;
-            $charger->deposit_device = $req->TabletNumber;
-            $charger->statu = "0";
-            $result = $charger->save();
+            if($charger_detail_total > 0){
+                $charger = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->first();
+                $charger->charge_amount = $charge_amount;
+                $charger->deposit_device = $req->TabletNumber;
+                $charger->statu = "0";
+                $charger->save();
+            }else{
+                $charger = new ChargerDetail();
+                $charger->charger_car_id = $req->ID;
+                $charger->school_date = date("Y-m-d");
+                $charger->time_seq = date("H");
+                $charger->charge_amount = $charge_amount;
+                $charger->deposit_device = $req->TabletNumber;
+                $charger->statu = "0";
+                $charger->save();
+            }
             return ['message' => 'Data sent successfully!'];
         }catch (Exception $e){
             return ['message' => 'Data transfer failed!', 'error'=>$e];
