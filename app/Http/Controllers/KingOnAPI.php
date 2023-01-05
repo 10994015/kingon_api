@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 class KingOnAPI extends Controller
 {
+    public $status;
     public function store(Request $req){
         //一個row是一個平板還是一台車?
         //如果是一個平板，我們一次新增就是新增他所有平版的資料嗎?
@@ -18,14 +19,16 @@ class KingOnAPI extends Controller
         try{
             $charger_detail_total = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->count();
             $charge_amount = 0;
+            $status = "";
             foreach($req['Trolley']['Ports'] as $post){
                 $charge_amount = $charge_amount + $post['Capacity'];
+                $status = $status . "\n" . $post['State'];
             }
             if($charger_detail_total > 0){
                 $charger = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->first();
                 $charger->charge_amount = $charge_amount;
                 $charger->deposit_device = $req->TabletNumber;
-                $charger->statu = "0";
+                $charger->statu = $status;
                 $charger->save();
             }else{
                 $charger = new ChargerDetail();
@@ -34,7 +37,7 @@ class KingOnAPI extends Controller
                 $charger->time_seq = date("H");
                 $charger->charge_amount = $charge_amount;
                 $charger->deposit_device = $req->TabletNumber;
-                $charger->statu = "0";
+                $charger->statu = $status;
                 $charger->save();
             }
             return ['message' => 'Data sent successfully!'];
