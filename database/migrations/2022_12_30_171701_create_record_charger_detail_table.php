@@ -15,7 +15,7 @@ class CreateRecordChargerDetailTable extends Migration
     {
         Schema::create('record_charger_detail', function (Blueprint $table) {
             $table->id();
-            $table->string('charger_car_id', 10);
+            $table->string('charger_car_id', 13);
             $table->char('school_date', 10);
             $table->char('time_seq', 2);
             $table->integer('port_no');

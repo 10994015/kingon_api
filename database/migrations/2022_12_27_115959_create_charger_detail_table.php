@@ -15,7 +15,7 @@ class CreateChargerDetailTable extends Migration
     public function up()
     {
         Schema::create('charger_detail', function (Blueprint $table) {
-            $table->string('charger_car_id', 10)->primary(); // 每台車的ID? 每台車的port寫在哪?
+            $table->string('charger_car_id', 13)->primary(); // 每台車的ID? 每台車的port寫在哪?
             $table->string('school_date', 10); // 什麼的時間?
             $table->string('time_seq', 2);  //什麼的時間?
             $table->string('charge_amount', 10); //每台車的充電量還是每個port的充電量
