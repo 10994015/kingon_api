@@ -20,7 +20,7 @@ class CreateChargerDetailTable extends Migration
             $table->string('time_seq', 2);  //什麼的時間?
             $table->string('charge_amount', 10); //每台車的充電量還是每個port的充電量
             $table->string('deposit_device', 2); //port數嗎?
-            $table->text('statu'); //每個port的狀態嗎?
+            $table->text('status'); //每個port的狀態嗎?
             $table->timestamps();
         });
         DB::unprepared('ALTER TABLE `charger_detail` DROP PRIMARY KEY, ADD PRIMARY KEY (  `charger_car_id`, `school_date`, `time_seq` )'); //四個複合式主鍵嗎?

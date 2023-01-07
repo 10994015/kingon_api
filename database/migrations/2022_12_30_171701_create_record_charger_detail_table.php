@@ -20,7 +20,7 @@ class CreateRecordChargerDetailTable extends Migration
             $table->char('time_seq', 2);
             $table->integer('port_no');
             $table->integer('capacity');
-            $table->text('statu');
+            $table->text('status');
             $table->timestamps();
         });
     }

@@ -22,13 +22,13 @@ class KingOnAPI extends Controller
             $status = "";
             foreach($req['Trolley']['Ports'] as $post){
                 $charge_amount = $charge_amount + $post['Capacity'];
-                $status = $status . "\n" . $post['State'];
+                $status = $status . ", " . $post['State'];
             }
             if($charger_detail_total > 0){
                 $charger = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->first();
                 $charger->charge_amount = $charge_amount;
                 $charger->deposit_device = $req->TabletNumber;
-                $charger->statu = $status;
+                $charger->status = $status;
                 $charger->save();
             }else{
                 $charger = new ChargerDetail();
@@ -37,7 +37,7 @@ class KingOnAPI extends Controller
                 $charger->time_seq = date("H");
                 $charger->charge_amount = $charge_amount;
                 $charger->deposit_device = $req->TabletNumber;
-                $charger->statu = $status;
+                $charger->status = $status;
                 $charger->save();
             }
             return ['message' => 'Data sent successfully!'];
@@ -57,7 +57,7 @@ class KingOnAPI extends Controller
                         $record->time_seq = date('H');
                         $record->port_no  = $req[$i]['No'];
                         $record->capacity  = $req[$i]['Capacity'];
-                        $record->statu  = $req[$i]['State'];
+                        $record->status  = $req[$i]['State'];
                         $record->save();
     
                         $storage = new StorageChargerDetail();
@@ -66,7 +66,7 @@ class KingOnAPI extends Controller
                         $storage->time_seq = date('H');
                         $storage->port_no  = $req[$i]['No'];
                         $storage->capacity  = $req[$i]['Capacity'];
-                        $storage->statu  = $req[$i]['State'];
+                        $storage->status  = $req[$i]['State'];
                         $storage->save();
                         
                         $i++;
@@ -89,7 +89,7 @@ class KingOnAPI extends Controller
                 $storages = StorageChargerDetail::where('charger_car_id', $id)->get();
                 foreach($storages as $storage){
                     $charge_amount = $charge_amount + $storage->capacity;
-                    $statu = $statu . $storage->statu . "\n";
+                    $statu = $statu . $storage->status . ", ";
                 }
     
     
@@ -98,7 +98,7 @@ class KingOnAPI extends Controller
                 $charger->school_date = date("Y-m-d");
                 $charger->time_seq = date("H");
                 $charger->charge_amount = $charge_amount;
-                $charger->statu = $statu;
+                $charger->status = $statu;
                 $charger->deposit_device = $charger_deposit_device;
                 $charger->save();
                 // StorageChargerDetail::where('id', '>', '0')->get()->delete();
