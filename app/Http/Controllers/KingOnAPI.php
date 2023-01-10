@@ -13,19 +13,22 @@ class KingOnAPI extends Controller
 {
     public $status;
     public function store(Request $req){
-        //一個row是一個平板還是一台車?
-        //如果是一個平板，我們一次新增就是新增他所有平版的資料嗎?
-        //如果是每台車，那statu上游是傳送每個平版的status, 那每個row的status要寫哪一台的?
+       
         try{
-            $charger_detail_total = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->count();
+            $charger_detail_total = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', "0".(date("Y")-1911).date("-m-d")], ['time_seq', date('H')]])->count();
+            log::info($charger_detail_total);
             $charge_amount = 0;
             $status = "";
-            foreach($req['Trolley']['Ports'] as $post){
+            foreach($req['Trolley']['Ports'] as $key => $post){
                 $charge_amount = $charge_amount + $post['Capacity'];
-                $status = $status . ", " . $post['State'];
+                if($key === array_key_last($req['Trolley']['Ports'])){
+                    $status = $status . $post['State'];
+                }else{
+                    $status = $status . $post['State'] .",";
+                }
             }
             if($charger_detail_total > 0){
-                $charger = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', date('Y-m-d')], ['time_seq', date('H')]])->first();
+                $charger = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', "0".(date("Y")-1911).date("-m-d")], ['time_seq', date('H')]])->first();
                 $charger->charge_amount = $charge_amount;
                 $charger->deposit_device = $req->TabletNumber;
                 $charger->status = $status;
@@ -33,7 +36,7 @@ class KingOnAPI extends Controller
             }else{
                 $charger = new ChargerDetail();
                 $charger->charger_car_id = $req->ID;
-                $charger->school_date = date("Y-m-d");
+                $charger->school_date = "0".(date("Y")-1911).date("-m-d");
                 $charger->time_seq = date("H");
                 $charger->charge_amount = $charge_amount;
                 $charger->deposit_device = $req->TabletNumber;
@@ -53,7 +56,7 @@ class KingOnAPI extends Controller
                     if(count($req[$i]) > 0 ){
                         $record = new RecordChargerDetail();
                         $record->charger_car_id = $id;
-                        $record->school_date = date("Y-m-d");
+                        $record->school_date = "0".(date("Y")-1911).date("-m-d");
                         $record->time_seq = date('H');
                         $record->port_no  = $req[$i]['No'];
                         $record->capacity  = $req[$i]['Capacity'];
@@ -62,7 +65,7 @@ class KingOnAPI extends Controller
     
                         $storage = new StorageChargerDetail();
                         $storage->charger_car_id = $id;
-                        $storage->school_date = date("Y-m-d");
+                        $storage->school_date = "0".(date("Y")-1911).date("-m-d");
                         $storage->time_seq = date('H');
                         $storage->port_no  = $req[$i]['No'];
                         $storage->capacity  = $req[$i]['Capacity'];
@@ -79,29 +82,32 @@ class KingOnAPI extends Controller
                 
             }
             $i = 0;
-            $charger_num = ChargerDetail::where([['charger_car_id', $id], ['school_date', date("Y-m-d")], ['time_seq', date('H')]])->count();
+            $charger_num = ChargerDetail::where([['charger_car_id', $id], ['school_date', "0".(date("Y")-1911).date("-m-d")], ['time_seq', date('H')]])->count();
+            
             if($charger_num == 0){
                 $charger_deposit_device = ChargerDetail::where('charger_car_id', $id)->orderBy('created_at', 'DESC')->first()->deposit_device;
-    
+                log::info($charger_deposit_device);
                 $charge_amount = 0;
                 $statu = "";
-    
                 $storages = StorageChargerDetail::where('charger_car_id', $id)->get();
-                foreach($storages as $storage){
+                foreach($storages as $key=>$storage){
                     $charge_amount = $charge_amount + $storage->capacity;
-                    $statu = $statu . $storage->status . ", ";
+                    if($key === array_key_last($storages)){
+                        $statu = $statu . $storage->status;
+                    }else{
+                        $statu = $statu . $storage->status . ",";
+                    }
                 }
-    
-    
+
                 $charger = new ChargerDetail();
                 $charger->charger_car_id = $id;
-                $charger->school_date = date("Y-m-d");
+                $charger->school_date = "0".(date("Y")-1911).date("-m-d");
                 $charger->time_seq = date("H");
                 $charger->charge_amount = $charge_amount;
                 $charger->status = $statu;
                 $charger->deposit_device = $charger_deposit_device;
                 $charger->save();
-                // StorageChargerDetail::where('id', '>', '0')->get()->delete();
+                // StorageChargerDetail::where('id', '>', '0')->delete();
                 DB::table('storage_charger_datail')->truncate();
 
             }
