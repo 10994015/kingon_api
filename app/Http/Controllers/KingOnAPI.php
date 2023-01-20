@@ -9,11 +9,20 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Validator;
 class KingOnAPI extends Controller
 {
     public $status;
     public function store(Request $req){
-       
+        $validator = Validator::make($req->all(), [
+            'ID' => 'required|size:14',
+            'TabletNumber'=>'required|integer',
+            'Trolley.Ports.*.No'=>'required|integer',
+            'Trolley.Ports.*.Capacity'=>'integer'
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
         try{
             $charger_detail_total = ChargerDetail::where([['charger_car_id', $req['ID']], ['school_date', "0".(date("Y")-1911).date("-m-d")], ['time_seq', date('H')]])->count();
             log::info($charger_detail_total);
@@ -49,6 +58,17 @@ class KingOnAPI extends Controller
         }
     }
     public function update(Request $req, $id){
+        $validator = Validator::make($req->all(), [
+            '*.No'=>'required|integer',
+            '*.Capacity'=>'integer'
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        $isset = ChargerDetail::where('charger_car_id', $id)->count();
+        if($isset == 0){
+            return ['message' => 'Data transfer failed!', 'error' => 'ID not found'];
+        }
         try{
             $i = 0;
             while(true){
@@ -86,16 +106,16 @@ class KingOnAPI extends Controller
             
             if($charger_num == 0){
                 $charger_deposit_device = ChargerDetail::where('charger_car_id', $id)->orderBy('created_at', 'DESC')->first()->deposit_device;
-                log::info($charger_deposit_device);
+                log::info('charger_deposit_device' . $charger_deposit_device); // 充電瓶數量
                 $charge_amount = 0;
                 $statu = "";
                 $storages = StorageChargerDetail::where('charger_car_id', $id)->get();
+                $count = $storages->count();
                 foreach($storages as $key=>$storage){
-                    $charge_amount = $charge_amount + $storage->capacity;
-                    if($key === array_key_last($storages)){
-                        $statu = $statu . $storage->status;
-                    }else{
-                        $statu = $statu . $storage->status . ",";
+                    $charge_amount = $charge_amount + intval($storage->capacity);
+                    $statu .= $storage->status ;
+                    if($key !== ($count-1)){
+                        $statu .= ',';
                     }
                 }
 
