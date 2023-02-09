@@ -138,5 +138,9 @@ class KingOnAPI extends Controller
         }
         
     }
+
+    public function test(){
+        return ['message' => 'test !!'];
+    }
     
 }

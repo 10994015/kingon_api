@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class StorageChargerDetail extends Model
 {
     use HasFactory;
-    protected $table = "storage_charger_datail";
+    protected $table = "storage_charger_detail";
 }

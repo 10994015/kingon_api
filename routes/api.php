@@ -24,3 +24,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/devices', [KingOnAPI::class, 'store']);
 Route::put('/devices/{id}/ports', [KingOnAPI::class, 'update']);
+Route::post('/text', [KingOnAPI::class, 'text']);
